@@ -1,0 +1,742 @@
+{
+  "algorithm": "Extended_Kalman_Filter",
+  "dropout_threshold_nm": 5.0,
+  "dark_maneuvers_found": 0,
+  "results": {
+    "41910000": {
+      "mmsi": "41910000",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910001": {
+      "mmsi": "41910001",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910002": {
+      "mmsi": "41910002",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910003": {
+      "mmsi": "41910003",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910004": {
+      "mmsi": "41910004",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910005": {
+      "mmsi": "41910005",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910006": {
+      "mmsi": "41910006",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910007": {
+      "mmsi": "41910007",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910008": {
+      "mmsi": "41910008",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910009": {
+      "mmsi": "41910009",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910010": {
+      "mmsi": "41910010",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910011": {
+      "mmsi": "41910011",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910012": {
+      "mmsi": "41910012",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910013": {
+      "mmsi": "41910013",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910014": {
+      "mmsi": "41910014",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910015": {
+      "mmsi": "41910015",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910016": {
+      "mmsi": "41910016",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910017": {
+      "mmsi": "41910017",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910018": {
+      "mmsi": "41910018",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910019": {
+      "mmsi": "41910019",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910020": {
+      "mmsi": "41910020",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910021": {
+      "mmsi": "41910021",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910022": {
+      "mmsi": "41910022",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910023": {
+      "mmsi": "41910023",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910024": {
+      "mmsi": "41910024",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910025": {
+      "mmsi": "41910025",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910026": {
+      "mmsi": "41910026",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910027": {
+      "mmsi": "41910027",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910028": {
+      "mmsi": "41910028",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910029": {
+      "mmsi": "41910029",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910030": {
+      "mmsi": "41910030",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910031": {
+      "mmsi": "41910031",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910032": {
+      "mmsi": "41910032",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910033": {
+      "mmsi": "41910033",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910034": {
+      "mmsi": "41910034",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910035": {
+      "mmsi": "41910035",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910036": {
+      "mmsi": "41910036",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910037": {
+      "mmsi": "41910037",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910038": {
+      "mmsi": "41910038",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "41910039": {
+      "mmsi": "41910039",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800000": {
+      "mmsi": "99800000",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800001": {
+      "mmsi": "99800001",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800002": {
+      "mmsi": "99800002",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800003": {
+      "mmsi": "99800003",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800004": {
+      "mmsi": "99800004",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800005": {
+      "mmsi": "99800005",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800006": {
+      "mmsi": "99800006",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800007": {
+      "mmsi": "99800007",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800008": {
+      "mmsi": "99800008",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800009": {
+      "mmsi": "99800009",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800010": {
+      "mmsi": "99800010",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800011": {
+      "mmsi": "99800011",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800012": {
+      "mmsi": "99800012",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800013": {
+      "mmsi": "99800013",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800014": {
+      "mmsi": "99800014",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800015": {
+      "mmsi": "99800015",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800016": {
+      "mmsi": "99800016",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800017": {
+      "mmsi": "99800017",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800018": {
+      "mmsi": "99800018",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800019": {
+      "mmsi": "99800019",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800020": {
+      "mmsi": "99800020",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800021": {
+      "mmsi": "99800021",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800022": {
+      "mmsi": "99800022",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800023": {
+      "mmsi": "99800023",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800024": {
+      "mmsi": "99800024",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800025": {
+      "mmsi": "99800025",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800026": {
+      "mmsi": "99800026",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800027": {
+      "mmsi": "99800027",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800028": {
+      "mmsi": "99800028",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800029": {
+      "mmsi": "99800029",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800030": {
+      "mmsi": "99800030",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800031": {
+      "mmsi": "99800031",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800032": {
+      "mmsi": "99800032",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800033": {
+      "mmsi": "99800033",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800034": {
+      "mmsi": "99800034",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800035": {
+      "mmsi": "99800035",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800036": {
+      "mmsi": "99800036",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800037": {
+      "mmsi": "99800037",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800038": {
+      "mmsi": "99800038",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800039": {
+      "mmsi": "99800039",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800040": {
+      "mmsi": "99800040",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800041": {
+      "mmsi": "99800041",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800042": {
+      "mmsi": "99800042",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800043": {
+      "mmsi": "99800043",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800044": {
+      "mmsi": "99800044",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800045": {
+      "mmsi": "99800045",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800046": {
+      "mmsi": "99800046",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800047": {
+      "mmsi": "99800047",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800048": {
+      "mmsi": "99800048",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800049": {
+      "mmsi": "99800049",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800050": {
+      "mmsi": "99800050",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800051": {
+      "mmsi": "99800051",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800052": {
+      "mmsi": "99800052",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800053": {
+      "mmsi": "99800053",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800054": {
+      "mmsi": "99800054",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800055": {
+      "mmsi": "99800055",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800056": {
+      "mmsi": "99800056",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800057": {
+      "mmsi": "99800057",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800058": {
+      "mmsi": "99800058",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "99800059": {
+      "mmsi": "99800059",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "419004001": {
+      "mmsi": "419004001",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "419004002": {
+      "mmsi": "419004002",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "419005001": {
+      "mmsi": "419005001",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 84,
+      "dropout_pings": 0
+    },
+    "419005002": {
+      "mmsi": "419005002",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    },
+    "419005003": {
+      "mmsi": "419005003",
+      "divergence_events": [],
+      "has_dark_maneuver": false,
+      "total_pings": 144,
+      "dropout_pings": 0
+    }
+  }
+}
