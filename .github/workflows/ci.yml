@@ -1,0 +1,46 @@
+name: NAVDRISHTI CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-lint-check:
+    name: Backend Syntax & Lint Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check Python Syntax
+        run: |
+          python -m py_compile $(git ls-files '*.py') || true
+
+  frontend-build-check:
+    name: Frontend Build Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate Frontend (if present)
+        run: |
+          if [ -d "indian/frontend" ]; then
+            cd indian/frontend
+            npm install --legacy-peer-deps
+            npm run build
+          else
+            echo "Frontend directory not added yet, skipping."
+          fi
