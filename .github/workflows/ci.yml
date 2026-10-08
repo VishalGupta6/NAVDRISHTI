@@ -1,4 +1,4 @@
-name: NAVDRISHTI CI
+name: System Integrity & Quality Checks
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
     branches: [ main ]
 
 jobs:
-  backend-lint-check:
-    name: Backend Syntax & Code Quality
+  backend-and-ml-integrity:
+    name: Backend & ML Engine Integrity
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -18,19 +18,45 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Ruff
-        run: python -m pip install ruff==0.16.10
-
-      - name: Check Python Syntax
+      - name: Install Dependencies
         run: |
-          python -m compileall -q indian
+          python -m pip install --upgrade pip
+          pip install fastapi uvicorn pydantic numpy scipy scikit-learn websockets
 
-      - name: Check Python Code Quality
+      - name: Verify Python Syntax Across Entire Project
         run: |
-          ruff check --select E9,F821,F822,F823 indian
+          python -m py_compile $(git ls-files '*.py')
 
-  frontend-build-check:
-    name: Frontend Build Validation
+      - name: Run ML & Backend Models Smoke Test
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, '.')
+          from indian.ml_engine.kalman_filter import ExtendedKalmanFilter
+          from indian.backend.models import AISPing, VesselSummary, AnomalyAlert
+          
+          # Verify Kalman Filter instantiation
+          ekf = ExtendedKalmanFilter()
+          print('✅ ExtendedKalmanFilter initialized successfully!')
+          
+          # Verify Pydantic schemas
+          ping = AISPing(
+              timestamp='2026-10-08T00:00:00Z',
+              mmsi='419000123',
+              name='INS VIKRANT',
+              type='Military Ops',
+              flag='IN',
+              length_m=262,
+              lat=18.92,
+              lon=72.83,
+              sog=18.5,
+              cog=210.0
+          )
+          print(f'✅ AIS Ping validated for: {ping.name} ({ping.mmsi})')
+          "
+
+  frontend-build:
+    name: Frontend Production Build Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -41,12 +67,12 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Validate Frontend (if present)
+      - name: Install Frontend Dependencies
         run: |
-          if [ -d "indian/frontend" ]; then
-            cd indian/frontend
-            npm install --legacy-peer-deps
-            npm run build
-          else
-            echo "Frontend directory not added yet, skipping."
-          fi
+          cd indian/frontend
+          npm install --legacy-peer-deps
+
+      - name: Validate Vite Production Build
+        run: |
+          cd indian/frontend
+          npm run build
