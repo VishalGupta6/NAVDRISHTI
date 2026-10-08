@@ -37,4 +37,43 @@ jobs:
           from indian.backend.models import AISPing, VesselSummary, AnomalyAlert
           
           # Verify Kalman Filter instantiation
-          ekf
+          ekf = ExtendedKalmanFilter()
+          print('✅ ExtendedKalmanFilter initialized successfully!')
+          
+          # Verify Pydantic schemas
+          ping = AISPing(
+              timestamp='2026-10-08T00:00:00Z',
+              mmsi='419000123',
+              name='INS VIKRANT',
+              type='Military Ops',
+              flag='IN',
+              length_m=262,
+              lat=18.92,
+              lon=72.83,
+              sog=18.5,
+              cog=210.0
+          )
+          print(f'✅ AIS Ping validated for: {ping.name} ({ping.mmsi})')
+          "
+
+  frontend-build:
+    name: Frontend Production Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd indian/frontend
+          npm install --legacy-peer-deps
+
+      - name: Validate Vite Production Build
+        run: |
+          cd indian/frontend
+          npm run build
