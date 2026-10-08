@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: indian-navy-mda
+    env: python
+    buildCommand: "pip install -r requirements.txt && (cd indian/frontend && npm install && npm run build)"
+    startCommand: "cd indian/backend && uvicorn main:app --host 0.0.0.0 --port $PORT --proxy-headers"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: CLASSIFICATION
+        value: RESTRICTED
