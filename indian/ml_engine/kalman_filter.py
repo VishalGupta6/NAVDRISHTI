@@ -7,6 +7,7 @@ and flags large divergence between predicted and actual reappearance position.
 
 import json
 import math
+from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Optional
 
@@ -120,6 +121,33 @@ def process_vessel_track(pings: List[Dict]) -> Dict:
 
         lat, lon = ping["lat"], ping["lon"]
 
+        # Check for dropout gap via timestamp interval between consecutive pings (> 10 mins)
+        if i > 0 and kf.initialized and not is_dropout:
+            prev_p = pings[i - 1]
+            try:
+                t_prev = datetime.fromisoformat(prev_p["timestamp"].replace("Z", ""))
+                t_curr = datetime.fromisoformat(ping["timestamp"].replace("Z", ""))
+                gap_sec = (t_curr - t_prev).total_seconds()
+                if gap_sec > 600:  # Gap > 10 minutes (dropout period)
+                    kf_gap = ExtendedKalmanFilter(dt=gap_sec)
+                    kf_gap.x = kf.x.copy()
+                    kf_gap.P = kf.P.copy()
+                    pred_pos = kf_gap.predict()
+                    divergence_nm = deg_to_nm(lat - pred_pos[0], lon - pred_pos[1])
+                    if divergence_nm > DROPOUT_THRESHOLD_NM:
+                        divergence_events.append({
+                            "dropout_start_step": i - 1,
+                            "reappear_step":      i,
+                            "predicted_lat":      float(pred_pos[0]),
+                            "predicted_lon":      float(pred_pos[1]),
+                            "actual_lat":         lat,
+                            "actual_lon":         lon,
+                            "divergence_nm":      round(divergence_nm, 2),
+                            "verdict":            "HIDDEN_MANEUVER_DETECTED",
+                        })
+            except Exception:
+                pass
+
         if not kf.initialized:
             sog = ping.get("sog") or 0.0
             cog_rad = math.radians(ping.get("cog") or 0.0)
@@ -130,7 +158,7 @@ def process_vessel_track(pings: List[Dict]) -> Dict:
             results.append({"step": i, "status": "init", "estimated_lat": lat, "estimated_lon": lon})
             continue
 
-        # Check dropout reappearance
+        # Check explicit dropout reappearance
         if dropout_start_idx is not None and pred_position_on_dropout is not None:
             pred_lat, pred_lon = pred_position_on_dropout
             divergence_nm = deg_to_nm(lat - pred_lat, lon - pred_lon)

@@ -1,7 +1,7 @@
 {
   "algorithm": "Extended_Kalman_Filter",
   "dropout_threshold_nm": 5.0,
-  "dark_maneuvers_found": 0,
+  "dark_maneuvers_found": 1,
   "results": {
     "41910000": {
       "mmsi": "41910000",
@@ -719,8 +719,19 @@
     },
     "419005001": {
       "mmsi": "419005001",
-      "divergence_events": [],
-      "has_dark_maneuver": false,
+      "divergence_events": [
+        {
+          "dropout_start_step": 56,
+          "reappear_step": 57,
+          "predicted_lat": 14.782420312792969,
+          "predicted_lon": 62.51273719947523,
+          "actual_lat": 15.330035,
+          "actual_lon": 61.722347,
+          "divergence_nm": 55.9,
+          "verdict": "HIDDEN_MANEUVER_DETECTED"
+        }
+      ],
+      "has_dark_maneuver": true,
       "total_pings": 84,
       "dropout_pings": 0
     },

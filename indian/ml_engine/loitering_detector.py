@@ -64,44 +64,47 @@ def detect_loitering_track(pings: List[Dict]) -> Dict:
     centroid_lat = np.mean(lats)
     centroid_lon = np.mean(lons)
     
-    # Check max distance from centroid
-    max_dist = 0.0
-    for p in pings:
-        dist = haversine(centroid_lat, centroid_lon, p["lat"], p["lon"])
-        if dist > max_dist:
-            max_dist = dist
-            
-    sogs = [p.get("sog", 0) for p in pings if isinstance(p.get("sog"), (int, float))]
-    avg_sog = float(np.mean(sogs)) if sogs else 0.0
-    
-    # Moving vessels in transit (avg SOG > 1.5 kn) are not loitering
-    if avg_sog > 1.5:
-        return {
-            "is_loitering": False,
-            "loiter_score": 0.0,
-            "radius_nm": round(max_dist, 3),
-            "duration_h": round(total_time_h, 2),
-            "centroid": {"lat": centroid_lat, "lon": centroid_lon}
-        }
+    # Check sliding windows (window size 15 to 40 pings, i.e. 1.25h to 3.5h)
+    max_score = 0.0
+    best_centroid = {"lat": pings[0]["lat"], "lon": pings[0]["lon"]}
+    best_radius = 0.0
+    best_duration = 0.0
+    is_loitering = False
 
-    # Loitering Score: proportional to time and inversely proportional to radius
-    # If max_dist for all pings is < 1nm over several hours, it's definitely loitering
-    score = 0.0
-    if total_time_h > MIN_LOITER_TIME_H:
-        # Normalize score: max score when radius is 0, 0 score when radius > 2nm
-        radius_penalty = max(0, 1.0 - (max_dist / 2.0))
-        time_bonus     = min(1.0, total_time_h / 12.0)
-        score = radius_penalty * time_bonus * 100
+    W = 20
+    for start_i in range(0, max(1, len(pings) - W + 1), 5):
+        sub = pings[start_i:start_i + W]
+        if not sub: continue
+        sub_lats = [p["lat"] for p in sub if p.get("lat") is not None]
+        sub_lons = [p["lon"] for p in sub if p.get("lon") is not None]
+        sub_sogs = [p.get("sog", 0) for p in sub if isinstance(p.get("sog"), (int, float))]
+        if not sub_lats: continue
         
-        if score > 70: # Higher threshold for true loitering anomaly
-            is_loitering = True
+        c_lat, c_lon = np.mean(sub_lats), np.mean(sub_lons)
+        max_d = max(haversine(c_lat, c_lon, lat, lon) for lat, lon in zip(sub_lats, sub_lons))
+        avg_sog = float(np.mean(sub_sogs)) if sub_sogs else 0.0
+        
+        t0 = datetime.fromisoformat(sub[0]["timestamp"].replace("Z", ""))
+        t1 = datetime.fromisoformat(sub[-1]["timestamp"].replace("Z", ""))
+        dur_h = (t1 - t0).total_seconds() / 3600.0
+        
+        if avg_sog < 3.0 and dur_h >= 1.0:
+            rad_pen = max(0, 1.0 - (max_d / 2.5))
+            score = rad_pen * min(1.0, dur_h / 2.0) * 100
+            if score > max_score:
+                max_score = score
+                best_centroid = {"lat": c_lat, "lon": c_lon}
+                best_radius = max_d
+                best_duration = dur_h
+                if score >= 35:
+                    is_loitering = True
 
     return {
         "is_loitering": is_loitering,
-        "loiter_score": round(score, 2),
-        "radius_nm":    round(max_dist, 3),
-        "duration_h":  round(total_time_h, 2),
-        "centroid":    {"lat": centroid_lat, "lon": centroid_lon}
+        "loiter_score": round(max_score, 2),
+        "radius_nm":    round(best_radius, 3),
+        "duration_h":  round(best_duration, 2),
+        "centroid":    best_centroid
     }
 
 
