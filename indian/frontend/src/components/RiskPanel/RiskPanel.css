@@ -1,0 +1,482 @@
+.risk-panel {
+  width: var(--panel-width);
+  height: calc(100vh - var(--header-height) - 40px);
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.risk-panel.loading, .risk-panel.error {
+  align-items: center;
+  justify-content: center;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sirep-btn {
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+}
+
+.sirep-btn:hover {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+
+.panel-header h2 {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.mmsi-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+
+.close-btn:hover {
+  color: var(--text-primary);
+}
+
+.panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.profile-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0,0,0,0.2);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.vessel-info h3 {
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+}
+
+.vessel-info p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.risk-score-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid var(--border-color);
+}
+
+.risk-score-badge.critical { border-color: var(--sev-critical); box-shadow: 0 0 15px var(--sev-critical-bg); }
+.risk-score-badge.high { border-color: var(--sev-high); }
+.risk-score-badge.medium { border-color: var(--sev-medium); }
+.risk-score-badge.low { border-color: var(--sev-low); }
+.risk-score-badge.normal { border-color: var(--sev-normal); }
+
+.score-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.danger-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, transparent 70%);
+  animation: danger-pulse 1s infinite alternate;
+  z-index: -1;
+}
+
+@keyframes danger-pulse {
+  from { transform: scale(0.8); opacity: 0.2; }
+  to { transform: scale(1.4); opacity: 0.6; }
+}
+
+.tactical-actions {
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.tactical-actions h4 {
+  font-size: 0.8rem;
+  color: #fca5a5;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.action-btn-red, .action-btn-warn, .action-btn-blue {
+    padding: 8px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+
+.action-btn-red { background: #ef4444; color: white; }
+.action-btn-warn { background: #f59e0b; color: white; }
+.action-btn-blue { background: #3b82f6; color: white; font-size: 0.6rem; }
+
+.action-btn-red:hover { background: #dc2626; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+.action-btn-warn:hover { background: #d97706; box-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
+
+.chart-section h4, .data-table-section h4 {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.radar-container, .line-container {
+  background: rgba(0,0,0,0.15);
+  border-radius: 8px;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+.telemetry-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.telemetry-table tr {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.telemetry-table td {
+  padding: 8px 4px;
+  color: var(--text-secondary);
+}
+
+.telemetry-table td:first-child {
+  font-weight: 500;
+}
+
+.telemetry-table td.fixed-num {
+  text-align: right;
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(59, 130, 246, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--accent-blue);
+  animation: spin 1s ease-in-out infinite;
+}
+
+.telemetry-table td.fixed-num.highlight-live {
+  color: #06b6d4;
+  text-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .risk-panel {
+    width: 100% !important;
+    height: 70vh !important;
+    top: auto !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    border-radius: 20px 20px 0 0 !important;
+    z-index: 3000 !important;
+  }
+
+  .panel-header {
+    padding: 16px 20px;
+  }
+
+  .panel-content {
+    padding: 20px;
+  }
+}
+
+/* SIREP Report Styles */
+.sirep-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px;
+  background: #f8fafc;
+  color: #0f172a;
+  border-radius: 0 0 12px 12px;
+  font-family: 'Inter', sans-serif;
+}
+
+.sirep-header {
+  border-bottom: 3px solid #0f172a;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.sirep-header h3 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.sirep-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.sirep-body section {
+  margin-bottom: 32px;
+}
+
+.sirep-body h4 {
+  font-size: 0.9rem;
+  font-weight: 800;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+  color: #1e293b;
+}
+
+.sirep-body p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 6px;
+  font-family: monospace;
+}
+
+.recommendation-text {
+  background: #fee2e2;
+  padding: 12px;
+  border-left: 4px solid #ef4444;
+  color: #991b1b;
+  font-weight: 700;
+}
+
+.sirep-footer {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.print-report-btn {
+  background: #1e293b;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media print {
+  /* Hide all UI elements except the RiskPanel */
+  .app-header, .alert-sidebar, .main-view-area, .header-actions, .close-btn, .print-report-btn {
+    display: none !important;
+  }
+
+  body, .app-container {
+    background: white !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .risk-panel {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    box-shadow: none !important;
+    background: white !important;
+    border: none !important;
+  }
+
+  .sirep-container {
+    padding: 0 !important;
+    background: white !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .sirep-header h3 {
+    color: black !important;
+  }
+
+  .sirep-body h4 {
+    border-bottom: 2px solid black !important;
+    color: black !important;
+  }
+
+  .sirep-body p {
+    color: black !important;
+  }
+
+  .recommendation-text {
+    border: 1px solid black !important;
+    background: #f1f5f9 !important;
+    color: black !important;
+  }
+  
+  section {
+    page-break-inside: avoid;
+    margin-bottom: 25px;
+  }
+
+  .sirep-map-snapshot {
+    display: flex !important;
+    gap: 20px;
+    align-items: center;
+    background: white !important;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+  }
+}
+
+.sirep-map-snapshot {
+  display: flex;
+  gap: 24px;
+  background: rgba(0,0,0,0.2);
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.tactical-grid {
+  width: 150px;
+  height: 150px;
+  background-image: 
+    linear-gradient(#475569 1px, transparent 1px),
+    linear-gradient(90deg, #475569 1px, transparent 1px);
+  background-size: 20px 20px;
+  position: relative;
+  border: 2px solid #1e293b;
+  background-color: #f1f5f9;
+}
+
+@media print {
+  .tactical-grid {
+    border-color: black !important;
+    background-color: white !important;
+    background-image: 
+      linear-gradient(#e2e8f0 1px, transparent 1px),
+      linear-gradient(90deg, #e2e8f0 1px, transparent 1px) !important;
+  }
+}
+
+.grid-target-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ef4444;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.grid-target-crosshair::before, .grid-target-crosshair::after {
+  content: '';
+  position: absolute;
+  background: #ef4444;
+}
+
+.grid-target-crosshair::before { top: 50%; left: -10px; width: 40px; height: 1px; }
+.grid-target-crosshair::after { left: 50%; top: -10px; width: 1px; height: 40px; }
+
+.grid-lat-label, .grid-lon-label {
+  position: absolute;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #1e293b;
+  font-family: monospace;
+}
+
+.grid-lat-label { top: -15px; left: 50%; transform: translateX(-50%); }
+.grid-lon-label { left: 155px; top: 50%; transform: translateY(-50%); }
+
+.tactical-legend {
+  flex: 1;
+}
+
+.tactical-legend p {
+  font-size: 0.75rem !important;
+  margin-bottom: 4px !important;
+}
+
