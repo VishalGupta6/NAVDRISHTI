@@ -1,0 +1,129 @@
+/* 📼 Blackbox Voyage Recorder Styles */
+
+.voyage-recorder-panel {
+  background: rgba(13, 22, 38, 0.95);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  border-radius: 8px;
+  padding: 0.8rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.recorder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rec-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #00f2fe;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rec-speed-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.speed-lbl {
+  font-size: 0.62rem;
+  color: #64748b;
+  font-weight: 800;
+  margin-right: 4px;
+}
+
+.speed-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.speed-btn.active {
+  background: rgba(0, 242, 254, 0.2);
+  color: #00f2fe;
+  border-color: rgba(0, 242, 254, 0.4);
+}
+
+.recorder-scrubber-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.play-pause-btn, .reset-btn {
+  background: rgba(0, 242, 254, 0.15);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  color: #00f2fe;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.play-pause-btn:hover, .reset-btn:hover {
+  background: rgba(0, 242, 254, 0.3);
+}
+
+.scrubber-track {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.timeline-slider {
+  width: 100%;
+  accent-color: #00f2fe;
+  cursor: pointer;
+}
+
+.timeline-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.62rem;
+  color: #64748b;
+  font-family: monospace;
+}
+
+.current-stamp {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.telemetry-snapshot {
+  display: flex;
+  gap: 1rem;
+  background: rgba(6, 11, 19, 0.6);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.snap-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.snap-item strong {
+  color: #f1f5f9;
+}

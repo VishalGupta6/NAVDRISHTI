@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NMDA - Maritime Tactical Control</title>
+    <!-- Tactical Exporter Deps -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- Tactical Authentication & Clearance Fetch Interceptor -->
+    <script>
+      (function() {
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options) {
+          options = options || {};
+          const urlStr = typeof url === 'string' ? url : (url && url.url ? url.url : '');
+          if (urlStr.includes('/api/')) {
+            const headers = new Headers(options.headers || {});
+            let clearance = sessionStorage.getItem('mda_clearance');
+            if (!clearance || clearance === 'null' || clearance === 'undefined') {
+              clearance = 'NAVY2026';
+            }
+            const shipKey = sessionStorage.getItem('ship_key') || '';
+            const shipMmsi = sessionStorage.getItem('ship_mmsi') || '';
+            if (!headers.has('X-Tactical-Clearance')) {
+              headers.set('X-Tactical-Clearance', clearance);
+            }
+            if (shipKey && !headers.has('X-Ship-Key')) {
+              headers.set('X-Ship-Key', shipKey);
+            }
+            if (shipMmsi && !headers.has('X-Ship-MMSI')) {
+              headers.set('X-Ship-MMSI', shipMmsi);
+            }
+            options.headers = headers;
+          }
+          return originalFetch.call(this, url, options);
+        };
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
