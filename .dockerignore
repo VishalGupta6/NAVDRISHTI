@@ -1,0 +1,13 @@
+ # Exclude build files and dependencies
+node_modules
+indian/frontend/dist
+indian/frontend/node_modules
+__pycache__
+*.pyc
+.ipynb_checkpoints
+.git
+.DS_Store
+*.log
+nohup.out
+.vscode
+.gemini
