@@ -2,26 +2,32 @@ name: NAVDRISHTI CI
 
 on:
   push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
   backend-lint-check:
-    name: Backend Syntax & Lint Check
+    name: Backend Syntax & Code Quality
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Set up Python 3.11
-        uses: setup-python@v5
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      - name: Install Ruff
+        run: python -m pip install ruff==0.16.10
+
       - name: Check Python Syntax
         run: |
-          python -m py_compile $(git ls-files '*.py') || true
+          python -m compileall -q indian
+
+      - name: Check Python Code Quality
+        run: |
+          ruff check --select E9,F821,F822,F823 indian
 
   frontend-build-check:
     name: Frontend Build Validation
