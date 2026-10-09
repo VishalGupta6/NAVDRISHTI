@@ -1,0 +1,435 @@
+================================================================================
+  INDIAN NAVY - NATIONAL MARITIME DOMAIN AWARENESS (NMDA) SYSTEM v2.0
+  COMPREHENSIVE TECHNICAL SPECIFICATION, ALGORITHMIC MANUAL & PROJECT DIRECTORY
+================================================================================
+Classification: RESTRICTED — Strategic Asset Documentation
+Generated: August 2026
+
+--------------------------------------------------------------------------------
+TABLE OF CONTENTS
+--------------------------------------------------------------------------------
+ 1. Executive Summary & Mission Overview
+ 2. Exhaustive Glossary of Technical & Maritime Terms
+ 3. Artificial Intelligence & Machine Learning Architecture (Deep Dive)
+    3.1 DBSCAN Unsupervised Spatial-Temporal Clustering
+    3.2 Deep Learning LSTM Autoencoder Kinematic Anomaly Detector
+    3.3 4-State Extended Kalman Filter (EKF) & Dark Vessel Detector
+    3.4 Spatial-Temporal Density Loitering Detector
+    3.5 Rule-Based Heuristic Detection Engines (STS & Position Spoofing)
+    3.6 Multi-Sensor Risk Fusion Formula & Severity Matrix
+ 4. End-to-End File-by-File System Architecture
+    4.1 Root Launcher & Orchestration Scripts
+    4.2 Backend Services & REST/WebSocket APIs (FastAPI)
+    4.3 Simulation & Synthetic AIS Generator Engine
+    4.4 Frontend Tactical Dashboard (React 18 + Vite + Leaflet)
+ 5. Complete Data Schemas & API Contracts
+ 6. Environment Variables & Operational Configurations
+ 7. Deployment & Operational Runbooks
+
+================================================================================
+1. EXECUTIVE SUMMARY & MISSION OVERVIEW
+================================================================================
+The Indian Navy National Maritime Domain Awareness (NMDA) System v2.0 is an 
+advanced, enterprise-grade AI/ML platform designed to provide real-time 
+maritime surveillance, threat detection, and operational intelligence across 
+the Indian Ocean Region (IOR), Arabian Sea, Bay of Bengal, and critical maritime 
+chokepoints (Strait of Malacca, Bab-el-Mandeb, and Strait of Hormuz).
+
+Core Capabilities:
+- Multi-Sensor Fusion: Ingests Automatic Identification System (AIS), Synthetic 
+  Aperture Radar (SAR), Radio Frequency (RF) intercepts, and optical satellite data.
+- Automated Anomaly Detection: Unsupervised machine learning models continuously 
+  monitor vessel trajectories for dark maneuvers, ship-to-ship transfers, 
+  position spoofing, route deviations, loitering, and illegal fishing (IUU).
+- Real-Time Live Feed: High-frequency WebSocket stream replaying synthetic 
+  satellite feeds with sub-second latency.
+- Tactical Command Dashboard: Interactive 2D Leaflet map, force-directed 
+  network graphs for link analysis, real-time risk gauges, and detailed vessel 
+  track history.
+
+================================================================================
+2. EXHAUSTIVE GLOSSARY OF TECHNICAL & MARITIME TERMS
+================================================================================
+- AIS (Automatic Identification System): An automated tracking system that uses 
+  transponders on ships to broadcast position, speed, course, heading, and 
+  identity via VHF radio frequencies to satellite and terrestrial receivers.
+- MMSI (Maritime Mobile Service Identity): A unique 9-digit number assigned to 
+  each vessel for radio communication and AIS identification.
+- IMO Number (International Maritime Organization Number): A permanent, unique 
+  7-digit identifier assigned to sea-going merchant ships that remains with 
+  the ship throughout its operational lifespan.
+- SOG (Speed Over Ground): The actual speed of the vessel relative to the Earth's 
+  surface, measured in knots (1 knot = 1.852 km/h = 1 nautical mile/hour).
+- COG (Course Over Ground): The actual direction of motion of the vessel relative 
+  to True North, measured in degrees (0.0° to 359.9°).
+- ROT (Rate of Turn): The speed at which a ship is turning left or right, measured 
+  in degrees per minute.
+- NavIC / VCSS: Navigation with Indian Constellation / Vessel Communication & 
+  Support System — ISRO's regional satellite navigation system used for naval 
+  geolocational reference in the Indian Ocean.
+- SAR (Synthetic Aperture Radar): A form of radar mounted on satellites that 
+  creates 2D images of the Earth's surface regardless of cloud cover, day, or night.
+- Dark Vessel: A ship that intentionally disables its AIS transponder to avoid 
+  detection, usually while engaging in illegal activities like smuggling or 
+  sanctions evasion.
+- STS Transfer (Ship-to-Ship Transfer): The movement of cargo, crude oil, or goods 
+  between two vessels positioned side-by-side at sea.
+- Position Spoofing: Injecting false GPS or AIS signals to broadcast an incorrect 
+  location while the vessel is physically elsewhere.
+- Route Deviation: Divergence of a vessel from established commercial shipping 
+  lanes or historical transit paths.
+- Loitering / Stationary Anomaly: Circling or remaining nearly stationary at low 
+  speed (< 2 kts) in non-anchorage open ocean areas for extended periods.
+- IUU Fishing: Illegal, Unreported, and Unregulated fishing activities in 
+  Exclusive Economic Zones (EEZ) or protected marine areas.
+- EKF (Extended Kalman Filter): An algorithm that uses state equations to 
+  estimate and predict the trajectory of a vessel from noisy measurements.
+- DBSCAN (Density-Based Spatial Clustering of Applications with Noise): An 
+  unsupervised clustering algorithm that discovers clusters of arbitrary shape 
+  and flags low-density noise points as outliers.
+- LSTM Autoencoder (Long Short-Term Memory Autoencoder): A recurrent deep learning 
+  neural network designed to learn normal sequential pattern representations and 
+  flag anomalies via high reconstruction error.
+
+================================================================================
+3. ARTIFICIAL INTELLIGENCE & MACHINE LEARNING ARCHITECTURE (DEEP DIVE)
+================================================================================
+
+--------------------------------------------------------------------------------
+3.1 DBSCAN Unsupervised Spatial-Temporal Clustering (`clustering.py`)
+--------------------------------------------------------------------------------
+Goal: Establish baseline commercial shipping lanes and identify anomalous routes.
+
+Feature Vector Construction per Vessel:
+For each vessel $i$, the AIS ping sequence is transformed into a 7-dimensional 
+feature vector:
+  X_i = [ mean_lat, mean_lon, mean_sog, mean_cog, std_lat, std_lon, path_length_nm ]
+
+Distances are calculated using the Haversine Great-Circle formula:
+  d = 2 * R * arcsin( sqrt( sin²(Δlat/2) + cos(lat1)*cos(lat2)*sin²(Δlon/2) ) )
+  where R = 3440.065 nautical miles.
+
+Model Parameters:
+- Standardization: StandardScaler() (zero mean, unit variance).
+- Distance Metric: Euclidean metric on standardized feature space.
+- Neighborhood Radius (eps): 1.2
+- Minimum Samples (min_samples): 2
+
+Classification Logic:
+- Core/Border Points: Assigned cluster ID >= 0 (Normal Shipping Lane).
+- Noise Points: Assigned cluster ID = -1. Flagged as `ROUTE_DEVIATION`.
+
+--------------------------------------------------------------------------------
+3.2 Deep Learning LSTM Autoencoder Kinematic Anomaly Detector (`autoencoder.py`)
+--------------------------------------------------------------------------------
+Goal: Detect kinematic anomalies (unusual acceleration, sharp course corrections, 
+eratic maneuvering) using an unsupervised sequence reconstruction network.
+
+Tensor Shape:
+- Sliding Window Size: T = 30 consecutive AIS pings.
+- Input Features (5): [ lat, lon, sog, cog, rot ].
+- Tensor Input Shape: (Batch_Size, 30, 5).
+
+Neural Network Layer Architecture:
+1. Input Layer: Shape (30, 5)
+2. Encoder Stage:
+   - LSTM Layer 1: 64 units, activation='tanh', return_sequences=True
+   - Dropout Layer: 0.1 rate
+   - LSTM Layer 2: 32 units, activation='tanh', return_sequences=False
+3. Bottleneck Bridge:
+   - RepeatVector: Repeats 32-dimensional latent vector 30 times → Shape (30, 32)
+4. Decoder Stage:
+   - LSTM Layer 3: 32 units, activation='tanh', return_sequences=True
+   - Dropout Layer: 0.1 rate
+   - LSTM Layer 4: 64 units, activation='tanh', return_sequences=True
+   - TimeDistributed Dense: 5 units → Output Shape (30, 5)
+
+Loss & Anomaly Criterion:
+- Loss Function: Mean Squared Error (MSE)
+  MSE_window = (1 / (30 * 5)) * ∑ (X_actual - X_reconstructed)²
+- Threshold Calculation: Trained exclusively on known-normal commercial vessel 
+  trajectories. Anomaly threshold set at the 95th percentile of normal MSE error.
+- Anomaly Trigger: Mean reconstruction error > 95th percentile threshold or 
+  anomalous windows > 3. Flagged as `KINEMATIC_ANOMALY`.
+- Fallback Execution: If TensorFlow is unavailable on host runtime, falls back to 
+  multi-variable z-score variance computation.
+
+--------------------------------------------------------------------------------
+3.3 4-State Extended Kalman Filter (EKF) & Dark Vessel Detector (`kalman_filter.py`)
+--------------------------------------------------------------------------------
+Goal: Track vessel positions, filter measurement noise, predict position during 
+AIS transponder outages, and flag covert dark maneuvers.
+
+State Vector:
+  x = [ lat, lon, v_lat, v_lon ]^T
+  where (v_lat, v_lon) represent velocities in degrees per second.
+
+State Equations (Constant Velocity Motion Model):
+  x_{k|k-1} = F * x_{k-1|k-1}
+  P_{k|k-1} = F * P_{k-1|k-1} * F^T + Q
+
+State Transition Matrix F (Time step Δt = 120s):
+  F = [ 1  0  Δt  0  ]
+      [ 0  1  0   Δt ]
+      [ 0  0  1   0  ]
+      [ 0  0  0   1  ]
+
+Observation Model H (Measurement z = [lat, lon]^T):
+  H = [ 1  0  0  0 ]
+      [ 0  1  0  0 ]
+
+  y_k = z_k - H * x_{k|k-1}          (Innovation)
+  S_k = H * P_{k|k-1} * H^T + R      (Innovation Covariance)
+  K_k = P_{k|k-1} * H^T * S_k⁻¹     (Kalman Gain)
+  x_{k|k} = x_{k|k-1} + K_k * y_k
+  P_{k|k} = (I - K_k * H) * P_{k|k-1}
+
+Dark Maneuver Detection Rule:
+1. When AIS status switches to `AIS_DROPOUT`, the EKF enters prediction-only mode, 
+   propagating predicted state x_pred for all missing pings.
+2. Upon transponder re-activation (`tracked`), Great-Circle displacement D_diff is 
+   calculated between predicted position (lat_pred, lon_pred) and actual 
+   reappearance position (lat_actual, lon_actual).
+3. If D_diff > 5.0 nautical miles, the event is logged as `HIDDEN_MANEUVER_DETECTED` 
+   and flagged as `DARK_VESSEL`.
+
+--------------------------------------------------------------------------------
+3.4 Spatial-Temporal Density Loitering Detector (`loitering_detector.py`)
+--------------------------------------------------------------------------------
+Goal: Identify vessels remaining inside a small geographic area for extended time.
+
+Algorithm Logic:
+1. Group pings by MMSI and sort chronologically.
+2. Compute track centroid: (lat_c, lon_c) = ( mean(lat), mean(lon) ).
+3. Calculate maximum radial distance R_max from centroid using Haversine formula.
+4. Calculate total track duration: Δt_hrs = (t_last - t_first) in hours.
+5. Compute Loitering Score (0 to 100):
+   Radius_Penalty = max(0, 1.0 - (R_max / 2.0))
+   Time_Bonus     = min(1.0, Δt_hrs / 12.0)
+   Loiter_Score   = Radius_Penalty * Time_Bonus * 100.0
+6. If Loiter_Score > 50.0 (where R_max < 0.5 nm and Δt_hrs > 1.0 hr), 
+   flagged as `LOITERING_ANOMALY`.
+
+--------------------------------------------------------------------------------
+3.5 Rule-Based Heuristic Detection Engines (`anomaly_scorer.py`)
+--------------------------------------------------------------------------------
+A) Ship-to-Ship (STS) Transfer Heuristic:
+- Iterates over all vessel pairs (A, B) at matching timestamps.
+- Triggers if distance between A and B < 0.005° (~0.3 nautical miles) AND 
+  both vessels maintain speed SOG < 4 knots for >= 20 consecutive pings (~40 mins).
+- Flagged as `STS_TRANSFER` and categorized as `Smuggling`.
+
+B) Position Spoofing Heuristic:
+- Analyzes consecutive pings for single vessel.
+- Triggers if coordinate jump |lat2 - lat1| > 3.0° or |lon2 - lon1| > 3.0° 
+  between consecutive 2-minute pings (speed equivalent > 5400 knots).
+- Flagged as `POSITION_SPOOFING`.
+
+--------------------------------------------------------------------------------
+3.6 Multi-Sensor Risk Fusion Formula & Severity Matrix
+--------------------------------------------------------------------------------
+The unified risk score (0.0 to 100.0) fuses outputs from all ML models and heuristics:
+
+Fused Risk Formula:
+  Score_Raw = (
+      0.15 * I(Route_Anomaly) +
+      0.25 * Normalize(AE_Reconstruction_Error) +
+      0.20 * I(Dark_Maneuver) +
+      0.15 * I(STS_Transfer) +
+      0.20 * (Loiter_Score / 100.0) +
+      0.05 * I(Position_Spoofing)
+  )
+  Risk_Score = round(Score_Raw * 100, 1)
+
+Severity Threshold Mapping:
+- CRITICAL : Risk Score >= 75.0  (Immediate Tactical Alert)
+- HIGH     : Risk Score 50.0 - 74.9
+- MEDIUM   : Risk Score 25.0 - 49.9
+- LOW      : Risk Score 10.0 - 24.9
+- NORMAL   : Risk Score < 10.0
+
+Risk Categorization Taxonomy:
+- Smuggling             : Triggered by `STS_TRANSFER`
+- IUU_Fishing           : Triggered when Vessel Type = "Fishing" AND (`LOITERING` or `ROUTE_DEVIATION`)
+- Military_Affiliation  : Triggered when Vessel Flag in ["KP", "IR", "CN"] AND `DARK_VESSEL`
+
+================================================================================
+4. END-TO-END FILE-BY-FILE SYSTEM ARCHITECTURE
+================================================================================
+
+--------------------------------------------------------------------------------
+4.1 Root Launcher & Orchestration Scripts
+--------------------------------------------------------------------------------
+- `/main.py`
+  Root entrypoint allowing standard Uvicorn runs or Vercel deployment. Adds 
+  `indian/backend` to `sys.path` and imports `app` from `indian.backend.main`.
+- `/run_local.sh`
+  Executable shell script that installs backend dependencies, builds frontend React 
+  assets via npm, frees port 8000, and starts the FastAPI app.
+- `/run_mda.sh`
+  Docker automation script checking for Docker daemon, launching docker-compose, 
+  and verifying endpoint health at http://localhost:8000/api/anomalies/stats.
+- `/start_backend.sh`
+  Standalone script to check port 8000 and run `python3 main.py` from `indian/backend`.
+- `/requirements.txt`
+  Root Python dependencies (fastapi, uvicorn, pydantic, numpy, pandas, scikit-learn, 
+  tensorflow, scipy, joblib, httpx, websockets).
+- `/Dockerfile` & `/docker-compose.yml`
+  Multi-stage Docker setup: Stage 1 builds React static assets using node:18; 
+  Stage 2 sets up Python 3.11 environment, copies built frontend dist, and exposes port 8000.
+
+--------------------------------------------------------------------------------
+4.2 Backend Services & REST/WebSocket APIs (`indian/backend`)
+--------------------------------------------------------------------------------
+- `indian/backend/main.py`
+  FastAPI application setup with OpenAPI schema metadata, CORS middleware for 
+  localhost:5173, async lifespan manager launching the live bridge background task, 
+  WebSocket endpoint `/ws/live-feed`, health check `/api/health`, feed endpoint `/api/feed`, 
+  and StaticFiles mount for serving frontend single-page application (SPA).
+- `indian/backend/routes/vessels.py`
+  REST endpoints:
+  - `GET /api/vessels`: Returns list of all tracked vessels with risk scores & latest lat/lon.
+  - `GET /api/vessels/{mmsi}`: Detailed metadata and track history for specific vessel.
+- `indian/backend/routes/anomalies.py`
+  REST endpoints:
+  - `GET /api/anomalies`: List of active anomaly alerts filtered by severity or type.
+  - `GET /api/anomalies/stats`: Aggregate summary metrics (total, critical, high, dark, STS, loitering).
+  - `POST /api/detect`: Triggers pipeline execution across all ML detection modules.
+- `indian/backend/routes/risk.py`
+  REST endpoint:
+  - `GET /api/risk/{mmsi}`: Comprehensive breakdown of risk weights, model outputs, and threat category flags.
+- `indian/backend/services/detection_service.py`
+  Orchestrator loading cached json data or running `ais_simulator.py`, `clustering.py`, 
+  `autoencoder.py`, `kalman_filter.py`, `loitering_detector.py`, and `anomaly_scorer.py`.
+- `indian/backend/services/live_bridge.py`
+  Async background task that cycles through AIS feed messages, stamps current UTC timestamp, 
+  enriches with risk alerts, and broadcasts to active WebSocket subscribers every 0.4s.
+
+--------------------------------------------------------------------------------
+4.3 Simulation & Synthetic AIS Generator Engine (`indian/simulation`)
+--------------------------------------------------------------------------------
+- `indian/simulation/ais_simulator.py`
+  Synthetic data generator generating realistic AIS trajectories for 100+ vessels 
+  across Arabian Sea, Lakshadweep, and Bay of Bengal.
+  Synthesizes specific behavioral scenarios:
+  - Normal cargo/tanker transits
+  - Dark vessel dropouts & reappearance off course
+  - Ship-to-ship transfer rendezvous pairs
+  - Position spoofing coordinate jumps
+  - Loitering fishing vessels inside EEZ boundaries
+
+--------------------------------------------------------------------------------
+4.4 Frontend Tactical Dashboard (`indian/frontend`)
+--------------------------------------------------------------------------------
+- `indian/frontend/src/App.jsx`
+  Main React application orchestrator holding application state (authentication lock, 
+  selected vessel, active alerts, risk filters, WebSocket connection status, map layer toggle).
+- `indian/frontend/src/components/LockScreen/`
+  Tactical single-password authentication lock screen featuring radar backdrop, 
+  show/hide passcode toggle, shake animation on invalid entry, and session persistence.
+- `indian/frontend/src/components/Map/`
+  Leaflet interactive map rendering vessel markers, custom heading vectors, 
+  historical track paths, EEZ boundaries, and anomaly warning icons.
+- `indian/frontend/src/components/AlertSidebar/`
+  Collapsible tactical sidebar rendering real-time alert feed, search filter, 
+  severity status badges (CRITICAL, HIGH, MEDIUM, LOW), and anomaly type filters.
+- `indian/frontend/src/components/RiskPanel/`
+  Analytical dashboard view displaying Recharts radar plots, risk score distribution 
+  bar charts, and threat breakdown cards.
+- `indian/frontend/src/components/VesselDetail/`
+  Modal inspector view detailing vessel flag, IMO, MMSI, dimensions, destination, 
+  ETA, speed, course, and raw AIS message logs.
+- `indian/frontend/src/components/LinkAnalysis/`
+  Force-directed graph view powered by `react-force-graph-2d` visualizing 
+  ship-to-ship transfer connections, shared owner entities, and illicit trade networks.
+
+================================================================================
+5. COMPLETE DATA SCHEMAS & API CONTRACTS
+================================================================================
+
+--------------------------------------------------------------------------------
+5.1 AIS Message Schema (JSON)
+--------------------------------------------------------------------------------
+{
+  "mmsi": "419001001",
+  "name": "INS VIKRAMADITYA",
+  "type": "Military",
+  "flag": "IN",
+  "lat": 18.922,
+  "lon": 72.834,
+  "sog": 18.5,
+  "cog": 210.0,
+  "heading": 212.0,
+  "rot": 0.0,
+  "nav_status": "Under way using engine",
+  "timestamp": "2026-08-04T19:15:00.000Z"
+}
+
+--------------------------------------------------------------------------------
+5.2 Anomaly Alert Schema (JSON)
+--------------------------------------------------------------------------------
+{
+  "alert_id": "ALT-1001",
+  "mmsi": "419001001",
+  "vessel_name": "INS VIKRAMADITYA",
+  "vessel_type": "Military",
+  "flag": "IN",
+  "risk_score": 82.5,
+  "severity": "CRITICAL",
+  "anomaly_types": ["DARK_VESSEL", "KINEMATIC_ANOMALY"],
+  "risk_categories": ["Military_Affiliation"],
+  "is_anomalous": true,
+  "last_lat": 18.922,
+  "last_lon": 72.834,
+  "loitering": false,
+  "generated_at": "2026-08-04T19:15:00.000Z"
+}
+
+--------------------------------------------------------------------------------
+5.3 System Health Response Schema (JSON)
+--------------------------------------------------------------------------------
+{
+  "system": "Maritime Domain Awareness API",
+  "status": "operational",
+  "version": "1.0.0",
+  "timestamp": "2026-08-04T19:15:00.000Z",
+  "stats": {
+    "total": 105,
+    "anomalous": 105,
+    "critical": 0,
+    "high": 2,
+    "medium": 1,
+    "low": 102,
+    "dark_vessels": 0,
+    "sts_transfers": 0,
+    "loitering": 102,
+    "spoofing": 0
+  },
+  "docs_url": "/docs",
+  "redoc_url": "/redoc"
+}
+
+================================================================================
+6. ENVIRONMENT VARIABLES & OPERATIONAL CONFIGURATIONS
+================================================================================
+- `SYSTEM_STATUS`  : Runtime state indicator (e.g. `PRODUCTION` or `DEVELOPMENT`)
+- `CLASSIFICATION` : Security classification header (default: `RESTRICTED`)
+- `PORT`           : Server listening port (default: `8000`)
+- `HOST`           : Server binding address (default: `0.0.0.0`)
+
+================================================================================
+7. DEPLOYMENT & OPERATIONAL RUNBOOKS
+================================================================================
+- Local Launch:
+    bash run_local.sh
+- Docker Launch:
+    bash run_mda.sh
+- Process Kill (if port 8000 blocked):
+    kill -9 $(lsof -t -i :8000)
+- Force Rebuild Frontend:
+    rm -f indian/frontend/package-lock.json
+    cd indian/frontend && npm install && npm run build
+
+================================================================================
+End of Technical Specification — Indian Navy NMDA Project v2.0
+================================================================================
