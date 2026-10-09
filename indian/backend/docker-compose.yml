@@ -1,0 +1,34 @@
+services:
+  mda-system:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: indian-navy-mda
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      - SYSTEM_STATUS=PRODUCTION
+      - CLASSIFICATION=RESTRICTED
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Persistent storage for tactical vessel registry and history logs
+      - ./indian/backend/data:/app/indian/backend/data
+      - ./indian/ml_engine/data:/app/indian/ml_engine/data
+      - ./indian/simulation/data:/app/indian/simulation/data
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/anomalies/stats"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10mb"
+        max-file: "3"
+
+networks:
+  default:
+    name: mda-tactical-net
