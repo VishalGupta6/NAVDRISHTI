@@ -122,49 +122,78 @@ def run_anomaly_scorer() -> List[Dict]:
         loiter_flag  = loiter_r.get("is_loitering", False)
         loiter_score = loiter_r.get("loiter_score", 0.0)
 
-        # Fused risk score
+        # Fused risk scoring engine (Maritime Domain Awareness tactical fusion)
         ae_norm = normalize(ae_error, min_ae, max_ae)
-        score_raw = (
-            0.15 * int(route_flag) + 
-            0.25 * ae_norm + 
-            0.20 * int(dark_flag) + 
-            0.15 * int(sts_flag) + 
-            0.20 * (loiter_score / 100.0) +
-            0.05 * int(spoof_flag)
-        )
-        risk_score = round(score_raw * 100, 1)
-
-        anomaly_types = []
-        risk_categories = []
-        if dark_flag:    anomaly_types.append("DARK_VESSEL")
-        if sts_flag:     
-            anomaly_types.append("STS_TRANSFER")
-            risk_categories.append("Smuggling")
-        if loiter_flag:  anomaly_types.append("LOITERING_ANOMALY")
-        if spoof_flag:   anomaly_types.append("POSITION_SPOOFING")
-        if kinematic_flag: anomaly_types.append("KINEMATIC_ANOMALY")
-        if route_flag:   anomaly_types.append("ROUTE_DEVIATION")
-
+        
+        # Ground truth / ping metadata
         pings = pings_by_mmsi.get(mmsi, [])
         v_name = pings[0]["name"] if pings else "UNKNOWN"
         v_type = pings[0]["type"] if pings else "UNKNOWN"
         v_flag = pings[0]["flag"] if pings else "XX"
 
-        if v_type == "Fishing" and (loiter_flag or route_flag): risk_categories.append("IUU_Fishing")
-        if v_flag in ["KP", "IR", "CN"] and dark_flag: risk_categories.append("Military_Affiliation")
+        anomaly_types = []
+        risk_categories = []
+        threat_score = 0.0
 
-        has_real_anomalies = len(anomaly_types) > 0
-        if not anomaly_types:
-            anomaly_types = ["NORMAL"]
+        # 1. Dark vessel / Kalman transponder evasion (Critical tactical threat)
+        if dark_flag:
+            threat_score += 55.0
+            anomaly_types.append("DARK_VESSEL")
+            if v_flag in ["KP", "IR", "CN", "RU"]:
+                threat_score += 25.0
+                risk_categories.append("Military_Affiliation")
 
-        severity = "NORMAL"
-        if risk_score >= 75: severity = "CRITICAL"
-        elif risk_score >= 50: severity = "HIGH"
-        elif risk_score >= 30: severity = "MEDIUM"
-        elif risk_score >= 15: severity = "LOW"
+        # 2. STS Transfer / Clandestine mid-ocean rendezvous (Smuggling threat)
+        if sts_flag:
+            threat_score += 50.0
+            anomaly_types.append("STS_TRANSFER")
+            risk_categories.append("Smuggling")
 
-        # A vessel is marked anomalous if it has a specific anomaly type or elevated risk
-        is_anomalous_vessel = has_real_anomalies or severity in ["CRITICAL", "HIGH", "MEDIUM"]
+        # 3. Position Spoofing / AIS Teleportation
+        if spoof_flag:
+            threat_score += 52.0
+            anomaly_types.append("POSITION_SPOOFING")
+            if v_flag in ["XX", "PA"]:
+                threat_score += 15.0
+                risk_categories.append("Flags_Of_Convenience")
+
+        # 4. Loitering in Strategic Zones / Sensitive EEZ
+        if loiter_flag and loiter_score > 35:
+            threat_score += 25.0 + (loiter_score * 0.3)
+            anomaly_types.append("PORT_LOITERING")
+            if v_type == "Fishing":
+                risk_categories.append("IUU_Fishing")
+            elif v_flag in ["CN", "PK"]:
+                risk_categories.append("Surveillance_Asset")
+
+        # 5. Route Deviation (outside DBSCAN lanes)
+        if route_flag:
+            threat_score += 18.0
+            anomaly_types.append("ROUTE_DEVIATION")
+
+        # 6. Kinematic Anomaly (Extreme dynamic maneuver / speed surge: ae_error >= 0.45)
+        if ae_error >= 0.45:
+            threat_score += 15.0
+            anomaly_types.append("KINEMATIC_ANOMALY")
+
+        if threat_score == 0.0:
+            # Normal baseline vessel: normal variations in speed/heading
+            risk_score = round(max(1.5, ae_error * 20), 1)
+            severity = "NORMAL"
+            is_anomalous_vessel = False
+            anomaly_types = []
+        else:
+            # Genuine tactical anomaly detected
+            risk_score = min(99.0, round(threat_score, 1))
+            is_anomalous_vessel = True
+            if risk_score >= 80:
+                severity = "CRITICAL"
+            elif risk_score >= 60:
+                severity = "HIGH"
+            elif risk_score >= 35:
+                severity = "MEDIUM"
+            else:
+                severity = "LOW"
 
         last_ping = sorted(pings, key=lambda x: x["timestamp"])[-1] if pings else {}
 
