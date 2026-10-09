@@ -5,9 +5,12 @@
   z-index: 0;
 }
 
-.custom-vessel-icon {
+.custom-vessel-icon,
+.leaflet-marker-icon.custom-vessel-icon {
   background: transparent !important;
   border: none !important;
+  transition: transform 1.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+  will-change: transform;
 }
 
 .vessel-marker-container {
@@ -369,4 +372,49 @@
   color: #ffffff;
   font-weight: 600;
 }
+
+/* ⚡ AI Tactical Intercept Vector & Locus Styles */
+@keyframes interceptDashPulse {
+  from { stroke-dashoffset: 32; }
+  to { stroke-dashoffset: 0; }
+}
+
+.tactical-intercept-vector {
+  animation: interceptDashPulse 1.2s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.9));
+}
+
+@keyframes locusGlowPulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
+.tactical-intercept-locus {
+  animation: locusGlowPulse 1.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px #ef4444);
+}
+
+.intercept-vector-tooltip {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid #ef4444 !important;
+  color: #fca5a5 !important;
+  font-weight: 800 !important;
+  font-size: 0.72rem !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4) !important;
+}
+
+.intercept-locus-tooltip {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid #ef4444 !important;
+  color: #ef4444 !important;
+  font-weight: 900 !important;
+  font-size: 0.72rem !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.5) !important;
+}
+
 
