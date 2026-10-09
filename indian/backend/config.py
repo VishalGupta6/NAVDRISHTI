@@ -1,7 +1,7 @@
 import os
 
 # Live Satellite AIS Stream Configuration
-AIS_STREAM_KEY = os.getenv("AIS_STREAM_KEY", "5d9462410d705a8dc3d26964a535e9528290016e")
+AIS_STREAM_KEY = os.getenv("AIS_STREAM_KEY", "5e8d9c778cce329fd4fb5d14375ecceb521b37d2")
 BOUNDING_BOXES = [
     [[8.0, 60.0], [26.0, 85.0]] # Arabian Sea, Laccadive Sea, Bay of Bengal, Indian EEZ
 ]

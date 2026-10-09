@@ -42,15 +42,108 @@ from services.detection_service import get_ais_feed, get_summary_stats
 from services.live_bridge import AISLiveBridge
 from contextlib import asynccontextmanager
 
-# ─── Live Bridge Setup ────────────────────────────────────────────────────────
+# ─── Live Simulator & Satellite Bridge Setup ──────────────────────────────────
 live_bridge = AISLiveBridge()
+SIM_STEP = 0
+
+async def live_fleet_simulator_loop():
+    """
+    Continuous real-time AIS tactical fleet simulator.
+    Advances all 105 vessels synchronously along their navigational waypoints,
+    updating the shared LIVE_BUFFER and broadcasting real-time updates to all clients.
+    """
+    global SIM_STEP
+    from services.detection_service import FEED_PATH, LIVE_BUFFER, get_alert_by_mmsi, _load_list
+    
+    feed = _load_list(FEED_PATH)
+    if not feed:
+        logger.warning("No AIS feed found for live fleet simulator.")
+        return
+
+    # Count distinct vessels in feed to establish step size
+    seen = set()
+    for m in feed:
+        seen.add(m.get("mmsi"))
+    num_vessels = len(seen) or 105
+    steps_total = max(1, len(feed) // num_vessels)
+
+    logger.info(f"⚓ Live Fleet Simulator initialized: {num_vessels} vessels across {steps_total} steps.")
+
+    while True:
+        try:
+            start_idx = (SIM_STEP % steps_total) * num_vessels
+            end_idx = start_idx + num_vessels
+            batch_pings = feed[start_idx:end_idx]
+            now_iso = datetime.now(timezone.utc).isoformat()
+            
+            live_updates = []
+            for ping in batch_pings:
+                mmsi = str(ping.get("mmsi"))
+                alert = get_alert_by_mmsi(mmsi)
+
+                v_live = {
+                    "mmsi": mmsi,
+                    "name": ping.get("name") or f"UNIT {mmsi}",
+                    "type": ping.get("type", "Cargo"),
+                    "flag": ping.get("flag", "UN"),
+                    "lat": ping.get("lat"),
+                    "lon": ping.get("lon"),
+                    "sog": ping.get("sog", 0.0),
+                    "cog": ping.get("cog", 0.0),
+                    "rot": ping.get("rot", 0),
+                    "draught": ping.get("draught", 10.0),
+                    "nav_status": ping.get("nav_status", "Under way using engine"),
+                    "length_m": ping.get("length_m", 150),
+                    "timestamp": now_iso,
+                    "is_live": True,
+                    "severity": alert.get("severity", "NORMAL") if alert else "NORMAL",
+                    "risk_score": alert.get("risk_score", 0.0) if alert else 0.0,
+                    "is_anomalous": alert.get("is_anomalous", False) if alert else False,
+                    "anomaly_types": alert.get("anomaly_types", []) if alert else [],
+                    "risk_categories": alert.get("risk_categories", []) if alert else [],
+                }
+
+                # Update backend LIVE_BUFFER so /api/vessels is always synchronized
+                if mmsi not in LIVE_BUFFER:
+                    LIVE_BUFFER[mmsi] = dict(v_live)
+                    LIVE_BUFFER[mmsi]["trail"] = []
+                else:
+                    LIVE_BUFFER[mmsi].update(v_live)
+                
+                LIVE_BUFFER[mmsi]["last_lat"] = v_live["lat"]
+                LIVE_BUFFER[mmsi]["last_lon"] = v_live["lon"]
+                LIVE_BUFFER[mmsi]["last_sog"] = v_live["sog"]
+                LIVE_BUFFER[mmsi]["last_cog"] = v_live["cog"]
+
+                live_updates.append(v_live)
+
+            # Broadcast batch update to all connected WebSocket tactical dashboards
+            if manager.active and live_updates:
+                batch_payload = json.dumps({
+                    "type": "BATCH_UPDATE",
+                    "step": SIM_STEP,
+                    "count": len(live_updates),
+                    "vessels": live_updates,
+                    "timestamp": now_iso,
+                })
+                await manager.broadcast(batch_payload)
+
+            SIM_STEP += 1
+            await asyncio.sleep(1.5)  # 1.5 second tick interval for smooth glide
+        except asyncio.CancelledError:
+            break
+        except Exception as e:
+            logger.error(f"Live simulation error: {e}")
+            await asyncio.sleep(2.0)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Start live satellite feed in background
-    asyncio.create_task(live_bridge.start())
+    # Start live satellite feed and synchronized fleet simulator in background
+    sim_task = asyncio.create_task(live_fleet_simulator_loop())
+    bridge_task = asyncio.create_task(live_bridge.start())
     yield
     # Cleanup
+    sim_task.cancel()
     live_bridge.stop()
 
 # ─── App Setup ────────────────────────────────────────────────────────────────
@@ -101,7 +194,7 @@ AI-powered REST API for real-time anomaly detection in maritime AIS data.
     ],
 )
 
-# CORS — allow the React dashboard on localhost, Vercel, and Render
+# CORS — allow the React dashboard on localhost / 127.0.0.1
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -181,39 +274,25 @@ manager = ConnectionManager()
 @app.websocket("/ws/live-feed")
 async def websocket_live_feed(websocket: WebSocket):
     """
-    Real-time AIS message stream via WebSocket.
-    Replays the pre-generated AIS feed at 1 message per 0.5 seconds,
-    cycling through to simulate continuous live data.
+    Real-time AIS tactical stream via WebSocket.
+    Transmits initial live fleet state upon connection, and receives real-time 
+    synchronized broadcast ticks from the background simulator.
     """
     await manager.connect(websocket)
-    feed   = get_ais_feed(last_n=2000)
-    if not feed:
-        await websocket.send_text(json.dumps({"error": "No AIS data available. Run the simulator first."}))
-        manager.disconnect(websocket)
-        return
-
-    idx = 0
     try:
-        from services.detection_service import get_alert_by_mmsi
-        while True:
-            msg = feed[idx % len(feed)]
-            mmsi = str(msg.get("mmsi"))
-            
-            # Enrich with real-time risk status from detection service
-            alert = get_alert_by_mmsi(mmsi)
-            
-            # Stamp with current time for "live" feel and merge risk data
-            msg_live = dict(msg)
-            msg_live["timestamp"] = datetime.now(timezone.utc).isoformat()
-            
-            if alert:
-                msg_live["severity"] = alert.get("severity", "NORMAL")
-                msg_live["is_anomalous"] = alert.get("is_anomalous", False)
-                msg_live["anomaly_types"] = alert.get("anomaly_types", [])
+        from services.detection_service import get_vessel_registry_enhanced
+        initial_fleet = get_vessel_registry_enhanced()
+        await websocket.send_text(json.dumps({
+            "type": "BATCH_UPDATE",
+            "step": SIM_STEP,
+            "count": len(initial_fleet),
+            "vessels": initial_fleet,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }))
 
-            await websocket.send_text(json.dumps(msg_live))
-            idx += 1
-            await asyncio.sleep(0.4)
+        # Keep connection open for broadcasts; listen for client heartbeats or messages
+        while True:
+            await websocket.receive_text()
     except WebSocketDisconnect:
         manager.disconnect(websocket)
     except Exception:
