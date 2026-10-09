@@ -53,4 +53,4 @@ LABEL version="1.0.0"
 # Start the application using Uvicorn (Production mode)
 # Serving from the 'indian/backend' directory
 WORKDIR /app/indian/backend
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
+CMD sh -c "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips '*'"
