@@ -101,7 +101,7 @@ AI-powered REST API for real-time anomaly detection in maritime AIS data.
     ],
 )
 
-# CORS — allow the React dashboard on localhost / 127.0.0.1
+# CORS — allow the React dashboard on localhost, Vercel, and Render
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -112,6 +112,7 @@ app.add_middleware(
         "http://localhost:8000",
         "http://127.0.0.1:8000",
     ],
+    allow_origin_regex=r"https://.*\.vercel\.app|https://.*\.onrender\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
