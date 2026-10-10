@@ -156,10 +156,10 @@ def get_summary_stats() -> Dict:
         "high":      sum(1 for a in alerts if a.get("severity") == "HIGH"),
         "medium":    sum(1 for a in alerts if a.get("severity") == "MEDIUM"),
         "low":       sum(1 for a in alerts if a.get("severity") == "LOW"),
-        "dark_vessels":  sum(1 for a in alerts if a.get("dark_vessel")),
-        "sts_transfers": sum(1 for a in alerts if a.get("sts_transfer")),
-        "loitering":     sum(1 for a in alerts if a.get("loitering")),
-        "spoofing":      sum(1 for a in alerts if a.get("position_spoofed")),
+        "dark_vessels":  sum(1 for a in alerts if "DARK_VESSEL" in a.get("anomaly_types", []) or a.get("dark_vessel")),
+        "sts_transfers": sum(1 for a in alerts if "STS_TRANSFER" in a.get("anomaly_types", []) or a.get("sts_transfer")),
+        "loitering":     sum(1 for a in alerts if "PORT_LOITERING" in a.get("anomaly_types", []) or a.get("loitering")),
+        "spoofing":      sum(1 for a in alerts if "POSITION_SPOOFING" in a.get("anomaly_types", []) or a.get("position_spoofed")),
         "tanker_count":  sum(1 for a in alerts if a.get("vessel_type") == "Tanker"),
         "near_india_count": sum(1 for a in alerts if 8.0 <= (a.get("last_lat") or 0) <= 25.0 and 65.0 <= (a.get("last_lon") or 0) <= 85.0),
         "anomalous_tankers": sum(1 for a in alerts if a.get("vessel_type") == "Tanker" and a.get("is_anomalous")),
@@ -234,12 +234,20 @@ def get_vessel_registry_enhanced():
         v["dwt"] = v.get("dwt") or (mmsi_num % 150000 + 10000)
         v["year_build"] = v.get("year_build") or (2000 + (mmsi_num % 24))
         
-        # Attach Severity
+        # Attach Severity and Risk Profile
         if mmsi_str in alerts:
-            v["severity"] = alerts[mmsi_str].get("severity", "NORMAL")
-            v["is_anomalous"] = alerts[mmsi_str].get("is_anomalous", False)
+            al = alerts[mmsi_str]
+            v["severity"] = al.get("severity", "NORMAL")
+            v["is_anomalous"] = al.get("is_anomalous", False)
+            v["risk_score"] = al.get("risk_score", 0.0)
+            v["anomaly_types"] = al.get("anomaly_types", [])
+            v["risk_categories"] = al.get("risk_categories", [])
         else:
             v["severity"] = v.get("severity", "NORMAL")
+            v["is_anomalous"] = False
+            v["risk_score"] = 0.0
+            v["anomaly_types"] = []
+            v["risk_categories"] = []
             
         merged.append(v)
 

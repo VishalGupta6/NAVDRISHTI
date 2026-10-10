@@ -36,6 +36,7 @@ function App() {
   const [activeLayers, setActiveLayers] = useState(['shoreline', 'maritime_region']);
   const [searchTerm, setSearchTerm] = useState('');
   const [isCommsDrawerOpen, setIsCommsDrawerOpen] = useState(false);
+  const [activeIntercept, setActiveIntercept] = useState(null);
 
 
   const searchResults = React.useMemo(() => {
@@ -55,15 +56,19 @@ function App() {
       fetch(`/api/anomalies/stats?_t=${ts}`, { cache: 'no-store' }).then(res => res.json()).then(setStats).catch(() => { });
       fetch(`/api/anomalies?_t=${ts}`, { cache: 'no-store' }).then(res => res.json()).then(data => setAlerts(data.alerts || [])).catch(() => { });
       fetch(`/api/vessels?_t=${ts}`, { cache: 'no-store' }).then(res => res.json()).then(data => {
-        const vesselMap = {};
         const vesselList = Array.isArray(data) ? data : (Array.isArray(data?.vessels) ? data.vessels : []);
-        vesselList.forEach(v => { if (v?.mmsi) vesselMap[v.mmsi] = v; });
-        setVessels(prev => ({ ...vesselMap, ...prev }));
+        setVessels(prev => {
+          const next = { ...prev };
+          vesselList.forEach(v => {
+            if (v?.mmsi) next[v.mmsi] = { ...(next[v.mmsi] || {}), ...v };
+          });
+          return next;
+        });
       }).catch(() => { });
     };
 
     fetchLiveData();
-    const timer = setInterval(fetchLiveData, 3000);
+    const timer = setInterval(fetchLiveData, 4000);
 
     fetch('/api/vessels/layers').then(res => res.json()).then(data => {
       setMapLayers(Array.isArray(data) ? data : []);
@@ -93,18 +98,27 @@ function App() {
     try {
       ws = new WebSocket(`${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/live-feed`);
       ws.onopen = () => {
-        // Show connecting animation for ~1 second before indicating Connected
         setWsStatus('Connecting');
-        setTimeout(() => setWsStatus('Connected'), 1000);
+        setTimeout(() => setWsStatus('Connected'), 600);
       };
       ws.onclose = () => setWsStatus('Disconnected');
       ws.onmessage = (e) => {
         try {
-          const msg = JSON.parse(e.data);
-          if (msg && msg.mmsi && msg.lat && msg.lon) {
+          const payload = JSON.parse(e.data);
+          if (payload?.type === 'BATCH_UPDATE' && Array.isArray(payload.vessels)) {
+            setVessels(prev => {
+              const next = { ...prev };
+              payload.vessels.forEach(v => {
+                if (v?.mmsi && v?.lat && v?.lon) {
+                  next[v.mmsi] = { ...(next[v.mmsi] || {}), ...v, is_live: true };
+                }
+              });
+              return next;
+            });
+          } else if (payload?.mmsi && payload?.lat && payload?.lon) {
             setVessels(prev => ({
               ...prev,
-              [msg.mmsi]: { ...(prev?.[msg.mmsi] || {}), ...msg, is_live: true }
+              [payload.mmsi]: { ...(prev?.[payload.mmsi] || {}), ...payload, is_live: true }
             }));
           }
         } catch (err) {
@@ -324,6 +338,7 @@ function App() {
                 onSelectVessel={(m) => { setSelectedMmsi(m); setIsDetailVisible(true); }}
                 activeLayers={activeLayers}
                 layerOpacity={layerOpacity}
+                activeIntercept={activeIntercept}
               />
 
               {/* Floating Restore Button - Only visible when tactical layers are hidden */}
@@ -493,6 +508,9 @@ function App() {
             isVisible={isDetailVisible}
             onToggleVisible={() => setIsDetailVisible(!isDetailVisible)}
             onClose={() => { setSelectedMmsi(null); setIsDetailVisible(false); }}
+            allVessels={Object.values(vessels || {})}
+            activeIntercept={activeIntercept}
+            onSetIntercept={setActiveIntercept}
           />
         )}
       </main>

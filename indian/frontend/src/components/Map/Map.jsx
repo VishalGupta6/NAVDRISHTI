@@ -139,7 +139,16 @@ const TacticalLayers = React.memo(({ activeLayers, layerOpacity, mdaData }) => {
   );
 });
 
-const Map = ({ vessels, alerts, historyData, selectedMmsi, onSelectVessel, activeLayers = [], layerOpacity = 0.6 }) => {
+const Map = ({ 
+  vessels, 
+  alerts, 
+  historyData, 
+  selectedMmsi, 
+  onSelectVessel, 
+  activeLayers = [], 
+  layerOpacity = 0.6,
+  activeIntercept = null 
+}) => {
   const initialCenter = [17.5, 72.5];
   const initialZoom = 6;
 
@@ -270,6 +279,52 @@ const Map = ({ vessels, alerts, historyData, selectedMmsi, onSelectVessel, activ
       {Object.entries(historicalTracks).map(([mmsi, pos]) => (
         <Polyline key={`hist-${mmsi}`} positions={pos} pathOptions={{ color: '#94a3b8', weight: 1, opacity: 0.4, dashArray: '5, 5' }} />
       ))}
+
+      {/* ⚡ Tactical Intercept Vector Overlay */}
+      {activeIntercept && (
+        <React.Fragment>
+          <Polyline 
+            positions={[activeIntercept.warshipCoords, activeIntercept.interceptCoords]} 
+            pathOptions={{ 
+              color: '#ef4444', 
+              weight: 3.5, 
+              opacity: 0.95, 
+              dashArray: '8, 8',
+              className: 'tactical-intercept-vector' 
+            }}
+          >
+            <Tooltip permanent className="intercept-vector-tooltip">
+              ⚡ INTERCEPT: {activeIntercept.warshipName} → {activeIntercept.targetName} ({activeIntercept.distanceNM} NM, ETA {activeIntercept.etaFormatted})
+            </Tooltip>
+          </Polyline>
+
+          <Polyline 
+            positions={[activeIntercept.targetCoords, activeIntercept.interceptCoords]} 
+            pathOptions={{ 
+              color: '#f59e0b', 
+              weight: 2, 
+              opacity: 0.8, 
+              dashArray: '4, 4' 
+            }}
+          />
+
+          <CircleMarker 
+            center={activeIntercept.interceptCoords} 
+            radius={9} 
+            pathOptions={{ 
+              color: '#ef4444', 
+              fillColor: '#ef4444', 
+              fillOpacity: 0.85, 
+              weight: 2,
+              className: 'tactical-intercept-locus'
+            }}
+          >
+            <Tooltip permanent direction="top" className="intercept-locus-tooltip">
+              🎯 INTERCEPT LOCUS ({activeIntercept.targetName})
+            </Tooltip>
+          </CircleMarker>
+        </React.Fragment>
+      )}
 
       {activeLayers.includes('vessel_routes') && mdaData.vessel_routes.map((route, ri) => (
         <React.Fragment key={`route-${ri}`}>
